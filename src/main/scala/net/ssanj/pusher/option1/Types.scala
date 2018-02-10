@@ -35,11 +35,11 @@ object Types {
   type CouldNotCreateOutgoingMessageOr[A] = Either[CouldNotCreateOutgoingMessage, A]
   type OutgoingEncodeErrorOr[A]           = Either[OutgoingEncodeError, A]
   type SendErrorOr[A]                     = Either[SendError, A]
-  type ErrorOr[A]                         = Either[PusherAppErrors, A]
+  type AppErrorOr[A]                      = Either[PusherAppErrors, A]
 
   trait Program {
 
-    def processMessage[A: Decode, B: Encode](config: Config): ErrorOr[ProcessResult] = {
+    def processMessage[A: Decode, B: Encode](config: Config): AppErrorOr[ProcessResult] = {
         for {
           message    <- receiveMessage(config).leftMap(PusherMessageReceiveError)
           dr         <- deleteMessage(config, message).leftMap(PusherDeleteMessageError)
