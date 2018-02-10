@@ -2,76 +2,40 @@ package net.ssanj.pusher.option1
 
 import QMessageTypes._
 import Model._
-import scala.language.implicitConversions
 
 object Types {
 
-  trait Json
-
-  trait Decode[A]
-
-  trait Encode[A]
-
   sealed trait PusherAppErrors
-  final case class PusherMessageReceiveError(reason: String, error: Option[Throwable]) extends PusherAppErrors
-
-    sealed trait MessageReceiveError
-    final case class ReceiveMessageError(reason: String, error: Option[Throwable]) extends MessageReceiveError
-    final case object ReceivedNoMessageError extends MessageReceiveError
-
-    type MessageReceiveErrorOr[A] = Either[MessageReceiveError, A]
-
+  final case class PusherMessageReceiveError(error: MessageReceiveError) extends PusherAppErrors
   final case class PusherDeleteMessageError(error: DeleteMessageError) extends PusherAppErrors
-
-    final case class DeleteMessageError(reason: String, error: Option[Throwable])
-
-    type DeleteMessageErrorOr[A] = Either[DeleteMessageError, A]
-
-
   final case class PusherCouldNotLogError(error: CouldNotLogError) extends PusherAppErrors
-    final case class CouldNotLogError(reason: String, error: Option[Throwable])
-
-    type CouldNotLogErrorOr[A] = Either[CouldNotLogError, A]
-
   final case class PusherIncomingDecodeError(error: IncomingDecodeError) extends PusherAppErrors
-    final case class IncomingDecodeError(reason: String, error: Option[Throwable])
-
-    type IncomingDecodeErrorOr[A] = Either[IncomingDecodeError, A]
-
   final case class PusherMessageFilteredOutError(error: MessageFilteredOutError) extends PusherAppErrors
-    final case class MessageFilteredOutError(reason: String, error: Option[Throwable])
-
-    type MessageFilteredOutErrorOr[A] = Either[MessageFilteredOutError, A]
-
   final case class PusherCouldNotCreateOutgoingMessage(error: CouldNotCreateOutgoingMessage) extends PusherAppErrors
-    final case class CouldNotCreateOutgoingMessage(reason: String, error: Option[Throwable])
-
-    type CouldNotCreateOutgoingMessageOr[A] = Either[CouldNotCreateOutgoingMessage, A]
-
   final case class PusherOutgoingEncodeError(error: OutgoingEncodeError) extends PusherAppErrors
-    final case class OutgoingEncodeError(reason: String, error: Option[Throwable])
-
-    type OutgoingEncodeErrorOr[A] = Either[OutgoingEncodeError, A]
-
   final case class PusherSendError(error: SendError) extends PusherAppErrors
-    final case class SendError(reason: String, error: Option[Throwable])
 
-    type SendErrorOr[A] = Either[SendError, A]
+  sealed trait MessageReceiveError
+  final case class ReceiveMessageError(reason: String, error: Option[Throwable]) extends MessageReceiveError
+  final case object ReceivedNoMessageError extends MessageReceiveError
 
-  type ErrorOr[A] = Either[PusherAppErrors, A]
+  final case class DeleteMessageError(reason: String, error: Option[Throwable])
+  final case class CouldNotLogError(reason: String, error: Option[Throwable])
+  final case class IncomingDecodeError(reason: String, error: Option[Throwable])
+  final case class MessageFilteredOutError(reason: String, error: Option[Throwable])
+  final case class CouldNotCreateOutgoingMessage(reason: String, error: Option[Throwable])
+  final case class OutgoingEncodeError(reason: String, error: Option[Throwable])
+  final case class SendError(reason: String, error: Option[Throwable])
 
-
-  trait EitherOps[L, R] {
-    def leftMap[L2](f: L => L2): Either[L2, R]
-  }
-
-  implicit def toEitherOps[L, R](et: Either[L, R]): EitherOps[L, R] = new EitherOps[L, R] {
-    def leftMap[L2](f: L => L2): Either[L2, R] = et.fold[Either[L2, R]](l => Left(f(l)), r => Right(r))
-  }
-
-  implicit def emptyDecoder[A](value: A): Decode[A] = new Decode[A] {}
-  implicit def emptyEncoder[A](value: A): Encode[A] = new Encode[A] {}
-
+  type MessageReceiveErrorOr[A]           = Either[MessageReceiveError, A]
+  type DeleteMessageErrorOr[A]            = Either[DeleteMessageError, A]
+  type CouldNotLogErrorOr[A]              = Either[CouldNotLogError, A]
+  type IncomingDecodeErrorOr[A]           = Either[IncomingDecodeError, A]
+  type MessageFilteredOutErrorOr[A]       = Either[MessageFilteredOutError, A]
+  type CouldNotCreateOutgoingMessageOr[A] = Either[CouldNotCreateOutgoingMessage, A]
+  type OutgoingEncodeErrorOr[A]           = Either[OutgoingEncodeError, A]
+  type SendErrorOr[A]                     = Either[SendError, A]
+  type ErrorOr[A]                         = Either[PusherAppErrors, A]
 
   trait Program {
 

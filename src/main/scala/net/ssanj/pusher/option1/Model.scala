@@ -11,5 +11,4 @@ object Model {
   final case class PushResult(value: String)
 
   final case class ProcessResult(message: QMessage, deleteResult: DeleteResult, pushResults: Seq[PushResult])
-
 }
