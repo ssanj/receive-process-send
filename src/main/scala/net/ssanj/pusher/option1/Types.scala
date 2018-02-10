@@ -13,7 +13,7 @@ object Types {
   trait Encode[A]
 
   sealed trait PusherAppErrors
-  final case class PusherMessageReceiveError(error: MessageReceiveError) extends PusherAppErrors
+  final case class PusherMessageReceiveError(reason: String, error: Option[Throwable]) extends PusherAppErrors
 
     sealed trait MessageReceiveError
     final case class ReceiveMessageError(reason: String, error: Option[Throwable]) extends MessageReceiveError
@@ -75,7 +75,6 @@ object Types {
 
   trait Program {
 
-    //send through implicit Decoder[A] and Encoder[B]
     def processMessage[A: Decode, B: Encode](config: Config): ErrorOr[ProcessResult] = {
         for {
           message    <- receiveMessage(config).leftMap(PusherMessageReceiveError)
