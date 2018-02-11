@@ -18,6 +18,26 @@ final class TestQ extends Queue[TestQ] {
   }
 }
 
+sealed trait ReceiveErrorType
+case object NoMessages extends ReceiveErrorType
+case object ReceiveError extends ReceiveErrorType
+
+final class TestQWithoutErrors(errorType: ReceiveErrorType, error: Option[Throwable]) extends Queue[TestQWithoutErrors] {
+
+  var receiveMessageConfig:Config = _
+
+  def receiveMessage(config: Config): MessageReceiveErrorOr[QMessage] = {
+    receiveMessageConfig = config
+    errorType match {
+      case NoMessages => Left(ReceivedNoMessageError)
+      case ReceiveError => Left(ReceiveMessageError("some receive exception message", error))
+    }
+
+  }
+
+  def deleteMessage(config: Config, message: QMessage): DeleteMessageErrorOr[DeleteResult] = ???
+}
+
 
 final class TestLog extends Log[TestLog] {
 
